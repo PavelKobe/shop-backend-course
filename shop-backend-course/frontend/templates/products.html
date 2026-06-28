@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Каталог{% endblock %}
+{% block content %}
+  <h1>Каталог</h1>
+  {% if products %}
+  <div class="grid">
+    {% for p in products %}
+      <a class="card" href="/p/{{ p.id }}">
+        <div class="thumb">{{ p.name[0] }}</div>
+        <div class="name">{{ p.name }}</div>
+        <div class="price">{{ "{:,.0f}".format(p.price).replace(",", " ") }} ₽</div>
+      </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="empty">Пока нет товаров. Добавь их через админку (модуль M10).</p>
+  {% endif %}
+{% endblock %}
