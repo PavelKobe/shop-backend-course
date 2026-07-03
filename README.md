@@ -48,10 +48,11 @@ source .venv/bin/activate        # Windows: .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
+uvicorn app.main:app --reload --port 8001
 
 Открой:
-- http://127.0.0.1:8000/docs — интерактивная документация (Swagger UI)
-- http://127.0.0.1:8000/api/v1/products — каталог-заглушка
+- http://127.0.0.1:8001/docs — интерактивная документация (Swagger UI)
+- http://127.0.0.1:8001/api/v1/products — каталог-заглушка
 
 ### 4. Интерактивный хаб курса
 

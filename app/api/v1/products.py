@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Query
+﻿from fastapi import APIRouter, HTTPException
 
 router = APIRouter(prefix="/products", tags=["products"])
 
@@ -8,16 +8,36 @@ FAKE = [
     {"id": 2, "name": "Турка", "price": 1490},
 ]
 
-
 @router.get("")
-async def list_products(
-    skip: int = 0,
-    limit: int = Query(20, le=100),
+async def list_products():
+    
+@router.get("/filter")
+async def filtr_products(
     q: str | None = None,
+    min_price: int | None = None,
+    max_price: int | None = None,
+    sort: str = "id",
+    skip: int = 0,
+    limit: int = 20,
 ):
     items = FAKE
+
     if q:
         items = [p for p in items if q.lower() in p["name"].lower()]
+
+    if min_price is not None:
+        items = [p for p in items if p["price"] >= min_price]
+
+    if max_price is not None:
+        items = [p for p in items if p["price"] <= max_price]
+
+    if sort == "price_asc":
+        items = sorted(items, key=lambda p: p["price"])
+    elif sort == "price_desc":
+        items = sorted(items, key=lambda p: p["price"], reverse=True)
+    elif sort == "name":
+        items = sorted(items, key=lambda p: p["name"])
+
     return items[skip : skip + limit]
 
 

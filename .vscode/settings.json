@@ -1,0 +1,7 @@
+{
+  "scm.diffDecorations": "none",
+  "scm.diffDecorationsGutterVisibility": "hover",
+  "git.decorations.enabled": false,
+  "gitlens.codeLens.enabled": false,
+  "gitlens.currentLine.enabled": false
+}
