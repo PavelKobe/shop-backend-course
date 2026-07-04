@@ -1,4 +1,5 @@
 ﻿from fastapi import APIRouter, HTTPException
+from app.schemas.product import ProductRead
 
 router = APIRouter(prefix="/products", tags=["products"])
 
@@ -8,10 +9,9 @@ FAKE = [
     {"id": 2, "name": "Турка", "price": 1490},
 ]
 
-@router.get("")
-async def list_products():
+
     
-@router.get("/filter")
+@router.get("",response_model=list[ProductRead])
 async def filtr_products(
     q: str | None = None,
     min_price: int | None = None,
@@ -41,7 +41,7 @@ async def filtr_products(
     return items[skip : skip + limit]
 
 
-@router.get("/{product_id}")
+@router.get("/{product_id}",response_model=ProductRead)
 async def get_product(product_id: int):
     for p in FAKE:
         if p["id"] == product_id:
