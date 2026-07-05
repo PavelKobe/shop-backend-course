@@ -135,7 +135,7 @@ alembic upgrade head     # накатить все до последней
 **Шаг 6.** Проверь, что таблица создана:
 
 ```bash
-docker compose exec db psql -U shop -d shop -c "\d products"
+
 ```
 
 Увидишь описание столбцов таблицы `products`.
