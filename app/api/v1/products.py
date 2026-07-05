@@ -1,5 +1,12 @@
-﻿from fastapi import APIRouter, HTTPException
-from app.schemas.product import ProductRead
+﻿from fastapi import APIRouter, Depends, HTTPException, Query, status
+
+from app.api.deps import get_product_service
+from app.schemas.product import ProductCreate, ProductRead, ProductUpdate
+from app.services.product import (
+    ProductNotFound,
+    ProductService,
+    SlugAlreadyExists,
+)
 
 router = APIRouter(prefix="/products", tags=["products"])
 
@@ -11,39 +18,55 @@ FAKE = [
 
 
     
-@router.get("",response_model=list[ProductRead])
-async def filtr_products(
-    q: str | None = None,
-    min_price: int | None = None,
-    max_price: int | None = None,
-    sort: str = "id",
+@router.get("", response_model=list[ProductRead])
+async def list_products(
     skip: int = 0,
-    limit: int = 20,
+    limit: int = Query(20, le=100),
+    service: ProductService = Depends(get_product_service),
 ):
-    items = FAKE
-
-    if q:
-        items = [p for p in items if q.lower() in p["name"].lower()]
-
-    if min_price is not None:
-        items = [p for p in items if p["price"] >= min_price]
-
-    if max_price is not None:
-        items = [p for p in items if p["price"] <= max_price]
-
-    if sort == "price_asc":
-        items = sorted(items, key=lambda p: p["price"])
-    elif sort == "price_desc":
-        items = sorted(items, key=lambda p: p["price"], reverse=True)
-    elif sort == "name":
-        items = sorted(items, key=lambda p: p["name"])
-
-    return items[skip : skip + limit]
+    return await service.list(skip, limit)
 
 
-@router.get("/{product_id}",response_model=ProductRead)
-async def get_product(product_id: int):
-    for p in FAKE:
-        if p["id"] == product_id:
-            return p
-    raise HTTPException(status_code=404, detail="Товар не найден")
+@router.post("", response_model=ProductRead, status_code=status.HTTP_201_CREATED)
+async def create_product(
+    data: ProductCreate,
+    service: ProductService = Depends(get_product_service),
+):
+    try:
+        return await service.create(data)
+    except SlugAlreadyExists:
+        raise HTTPException(status.HTTP_409_CONFLICT, "Товар с таким именем уже есть")
+
+
+@router.get("/{product_id}", response_model=ProductRead)
+async def get_product(
+    product_id: int,
+    service: ProductService = Depends(get_product_service),
+):
+    try:
+        return await service.get(product_id)
+    except ProductNotFound:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Товар не найден")
+
+
+@router.patch("/{product_id}", response_model=ProductRead)
+async def update_product(
+    product_id: int,
+    data: ProductUpdate,
+    service: ProductService = Depends(get_product_service),
+):
+    try:
+        return await service.update(product_id, data)
+    except ProductNotFound:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Товар не найден")
+
+
+@router.delete("/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_product(
+    product_id: int,
+    service: ProductService = Depends(get_product_service),
+):
+    try:
+        await service.delete(product_id)
+    except ProductNotFound:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Товар не найден")

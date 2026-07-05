@@ -7,7 +7,7 @@ class ProductCreate(BaseModel):
     description: str | None = None
 
 class ProductUpdate(BaseModel):
-    name: str | None = Field(default=None,max_length=1,min_length=200)
+    name: str | None = Field(default=None,max_length=200,min_length=1)
     price: Decimal | None = Field(default=None,gt=0)
     description: str | None = None
 
