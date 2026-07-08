@@ -7,7 +7,8 @@ from app.services.product import (
     ProductService,
     SlugAlreadyExists,
 )
-
+from app.api.deps import get_current_admin
+from app.models.user import User
 router = APIRouter(prefix="/products", tags=["products"])
 
 # Временные данные вместо базы (заменим в M03).
@@ -30,6 +31,7 @@ async def list_products(
 @router.post("", response_model=ProductRead, status_code=status.HTTP_201_CREATED)
 async def create_product(
     data: ProductCreate,
+    admin: User = Depends(get_current_admin),
     service: ProductService = Depends(get_product_service),
 ):
     try:
@@ -53,6 +55,7 @@ async def get_product(
 async def update_product(
     product_id: int,
     data: ProductUpdate,
+    admin: User = Depends(get_current_admin),
     service: ProductService = Depends(get_product_service),
 ):
     try:
@@ -64,6 +67,7 @@ async def update_product(
 @router.delete("/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_product(
     product_id: int,
+    admin: User = Depends(get_current_admin),
     service: ProductService = Depends(get_product_service),
 ):
     try:

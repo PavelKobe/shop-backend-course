@@ -5,12 +5,13 @@ from fastapi import Depends, FastAPI
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.v1 import products
+from app.api.v1 import products,auth
 from app.core.db import get_session
 
 app = FastAPI(title="Shop API", version="0.1.0")
 
 app.include_router(products.router, prefix="/api/v1")
+app.include_router(auth.router, prefix="/api/v1")
 
 
 #@app.get("/health")
