@@ -5,11 +5,16 @@
   {% if products %}
   <div class="grid">
     {% for p in products %}
-      <a class="card" href="/p/{{ p.id }}">
-        <div class="thumb">{{ p.name[0] }}</div>
-        <div class="name">{{ p.name }}</div>
-        <div class="price">{{ "{:,.0f}".format(p.price).replace(",", " ") }} ₽</div>
-      </a>
+      <div class="card">
+        <a href="/p/{{ p.id }}">
+          <div class="thumb">{{ p.name[0] }}</div>
+          <div class="name">{{ p.name }}</div>
+          <div class="price">{{ "{:,.0f}".format(p.price).replace(",", " ") }} ₽</div>
+        </a>
+        <form method="post" action="/cart/add/{{ p.id }}">
+          <button class="btn" type="submit">В корзину</button>
+        </form>
+      </div>
     {% endfor %}
   </div>
   {% else %}

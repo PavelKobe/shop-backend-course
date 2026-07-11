@@ -12,8 +12,7 @@
         <td>{{ "{:,.0f}".format(it.price).replace(",", " ") }} ₽</td>
         <td>{{ it.qty }}</td>
         <td>
-          <form method="post" action="/cart/remove">
-            <input type="hidden" name="product_id" value="{{ it.product_id }}">
+          <form method="post" action="/cart/remove/{{ it.product_id }}">
             <button class="link-btn">убрать</button>
           </form>
         </td>

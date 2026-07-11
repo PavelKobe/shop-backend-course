@@ -42,6 +42,42 @@ class CartService:
         await self.session.commit()
         return await self._get_or_create_cart(user_id)
 
+    async def get_summary(self, user_id: int) -> tuple[list[dict], Decimal]:
+        cart = await self._get_or_create_cart(user_id)
+        stmt = (
+            select(Product, CartItem.quantity)
+            .join(CartItem, CartItem.product_id == Product.id)
+            .where(CartItem.cart_id == cart.id)
+            .order_by(CartItem.id)
+        )
+        rows = (await self.session.execute(stmt)).all()
+
+        items = [
+            {
+                "product_id": product.id,
+                "name": product.name,
+                "price": product.price,
+                "qty": quantity,
+            }
+            for product, quantity in rows
+        ]
+        total = sum(
+            (item["price"] * item["qty"] for item in items),
+            start=Decimal("0"),
+        )
+        return items, total
+
+    async def remove(self, user_id: int, product_id: int) -> None:
+        cart = await self._get_or_create_cart(user_id)
+        stmt = select(CartItem).where(
+            CartItem.cart_id == cart.id,
+            CartItem.product_id == product_id,
+        )
+        item = await self.session.scalar(stmt)
+        if item is not None:
+            await self.session.delete(item)
+            await self.session.commit()
+
     async def checkout(self, user_id: int) -> Order:
         cart = await self._get_or_create_cart(user_id)
         if not cart.items:
