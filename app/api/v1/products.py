@@ -25,7 +25,7 @@ async def list_products(
     limit: int = Query(20, le=100),
     service: ProductService = Depends(get_product_service),
 ):
-    return await service.list(skip, limit)
+    return await service.list_cached(skip, limit)
 
 
 @router.post("", response_model=ProductRead, status_code=status.HTTP_201_CREATED)
