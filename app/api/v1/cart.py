@@ -5,6 +5,7 @@ from app.core.db import get_session
 from app.models.user import User
 from app.schemas.order import AddToCart, OrderRead
 from app.services.cart import CartService
+from app.tasks.email import send_order_email
 
 router = APIRouter(prefix="/cart", tags=["cart"])
 
@@ -27,11 +28,11 @@ async def add_to_cart(
 
 
 @router.post("/checkout", response_model=OrderRead)
-async def checkout(
-    user: User = Depends(get_current_user),
-    service: CartService = Depends(get_cart_service),
-):
+async def checkout(user=Depends(get_current_user), service=Depends(get_cart_service)):
     try:
-        return await service.checkout(user.id)
+        order = await service.checkout(user.id)
     except ValueError as e:
         raise HTTPException(400, str(e))
+    # .delay() ставит задачу в очередь и сразу возвращает управление
+    send_order_email.delay(order.id, user.email)
+    return order
