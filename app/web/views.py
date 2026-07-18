@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -18,7 +20,7 @@ DEMO_USER_ID = 1
 @router.get("/", response_class=HTMLResponse)
 async def shop_index(
     request: Request,
-    service: ProductService = Depends(get_product_service),
+    service: Annotated[ProductService, Depends(get_product_service)],
 ):
     products = await service.list(limit=100)
     return templates.TemplateResponse(
@@ -32,7 +34,7 @@ async def shop_index(
 async def product_page(
     product_id: int,
     request: Request,
-    service: ProductService = Depends(get_product_service),
+    service: Annotated[ProductService, Depends(get_product_service)],
 ):
     try:
         product = await service.get(product_id)
@@ -54,7 +56,7 @@ async def product_page(
 @router.post("/cart/add/{product_id}")
 async def add_product_to_cart(
     product_id: int,
-    cart_service: CartService = Depends(get_cart_service),
+    cart_service: Annotated[CartService, Depends(get_cart_service)],
 ):
     await cart_service.add(DEMO_USER_ID, product_id, quantity=1)
     return RedirectResponse(url="/cart", status_code=303)
@@ -63,7 +65,7 @@ async def add_product_to_cart(
 @router.post("/cart/remove/{product_id}")
 async def remove_product_from_cart(
     product_id: int,
-    cart_service: CartService = Depends(get_cart_service),
+    cart_service: Annotated[CartService, Depends(get_cart_service)],
 ):
     await cart_service.remove(DEMO_USER_ID, product_id)
     return RedirectResponse(url="/cart", status_code=303)
@@ -72,7 +74,7 @@ async def remove_product_from_cart(
 @router.get("/cart", response_class=HTMLResponse)
 async def cart_page(
     request: Request,
-    cart_service: CartService = Depends(get_cart_service),
+    cart_service: Annotated[CartService, Depends(get_cart_service)],
 ):
     items, total = await cart_service.get_summary(DEMO_USER_ID)
     return templates.TemplateResponse(

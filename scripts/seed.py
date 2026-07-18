@@ -36,9 +36,7 @@ async def seed() -> None:
             category.slug: category
             for category in (
                 await session.scalars(
-                    select(Category).where(
-                        Category.slug.like("lesson-category-%")
-                    )
+                    select(Category).where(Category.slug.like("lesson-category-%"))
                 )
             ).all()
         }

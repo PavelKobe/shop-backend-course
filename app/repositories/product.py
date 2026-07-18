@@ -1,11 +1,15 @@
 from collections.abc import Sequence
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.models.product import Product
 
+
 class ProductRepository:
-    def __init__(self, session: AsyncSession)-> None:
+    def __init__(self, session: AsyncSession) -> None:
         self.session = session
+
     async def list(self, skip: int, limit: int) -> Sequence[Product]:
         stmt = select(Product).offset(skip).limit(limit).order_by(Product.id)
         return (await self.session.scalars(stmt)).all()
@@ -25,6 +29,4 @@ class ProductRepository:
 
     async def delete(self, product: Product) -> None:
         await self.session.delete(product)
-        await self.session.commit()  
-
-
+        await self.session.commit()

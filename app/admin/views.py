@@ -5,6 +5,7 @@ from app.models.order import Order, OrderItem
 from app.models.product import Product
 from app.models.user import User
 
+
 class ProductAdmin(ModelView, model=Product):
     column_list = [Product.id, Product.name, Product.price, Product.stock]
     column_searchable_list = [Product.name]
@@ -29,6 +30,11 @@ class OrderAdmin(ModelView, model=Order):
 
 
 class OrderItemAdmin(ModelView, model=OrderItem):
-    column_list = [OrderItem.id, OrderItem.order_id, OrderItem.product_id,
-                   OrderItem.quantity, OrderItem.price]
+    column_list = [
+        OrderItem.id,
+        OrderItem.order_id,
+        OrderItem.product_id,
+        OrderItem.quantity,
+        OrderItem.price,
+    ]
     name_plural = "Позиции заказов"

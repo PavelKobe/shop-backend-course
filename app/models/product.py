@@ -1,7 +1,13 @@
 from decimal import Decimal
-from sqlalchemy import Numeric,String,ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column,relationship
+from typing import TYPE_CHECKING
+
+from sqlalchemy import ForeignKey, Numeric, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from app.models.base import Base
+
+if TYPE_CHECKING:
+    from app.models.category import Category
 
 
 class Product(Base):
@@ -19,4 +25,3 @@ class Product(Base):
         index=True,
     )
     category: Mapped["Category | None"] = relationship(back_populates="products")
-from app.models.category import Category   

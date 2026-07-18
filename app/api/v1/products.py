@@ -1,14 +1,16 @@
-﻿from fastapi import APIRouter, Depends, HTTPException, Query, status
+from typing import Annotated
 
-from app.api.deps import get_product_service
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+
+from app.api.deps import get_current_admin, get_product_service
+from app.models.user import User
 from app.schemas.product import ProductCreate, ProductRead, ProductUpdate
 from app.services.product import (
     ProductNotFound,
     ProductService,
     SlugAlreadyExists,
 )
-from app.api.deps import get_current_admin
-from app.models.user import User
+
 router = APIRouter(prefix="/products", tags=["products"])
 
 # Временные данные вместо базы (заменим в M03).
@@ -18,12 +20,11 @@ FAKE = [
 ]
 
 
-    
 @router.get("", response_model=list[ProductRead])
 async def list_products(
+    service: Annotated[ProductService, Depends(get_product_service)],
     skip: int = 0,
     limit: int = Query(20, le=100),
-    service: ProductService = Depends(get_product_service),
 ):
     return await service.list_cached(skip, limit)
 
@@ -31,46 +32,48 @@ async def list_products(
 @router.post("", response_model=ProductRead, status_code=status.HTTP_201_CREATED)
 async def create_product(
     data: ProductCreate,
-    admin: User = Depends(get_current_admin),
-    service: ProductService = Depends(get_product_service),
+    admin: Annotated[User, Depends(get_current_admin)],
+    service: Annotated[ProductService, Depends(get_product_service)],
 ):
     try:
         return await service.create(data)
-    except SlugAlreadyExists:
-        raise HTTPException(status.HTTP_409_CONFLICT, "Товар с таким именем уже есть")
+    except SlugAlreadyExists as err:
+        raise HTTPException(
+            status.HTTP_409_CONFLICT, "Товар с таким именем уже есть"
+        ) from err
 
 
 @router.get("/{product_id}", response_model=ProductRead)
 async def get_product(
     product_id: int,
-    service: ProductService = Depends(get_product_service),
+    service: Annotated[ProductService, Depends(get_product_service)],
 ):
     try:
         return await service.get(product_id)
-    except ProductNotFound:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Товар не найден")
+    except ProductNotFound as err:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Товар не найден") from err
 
 
 @router.patch("/{product_id}", response_model=ProductRead)
 async def update_product(
     product_id: int,
     data: ProductUpdate,
-    admin: User = Depends(get_current_admin),
-    service: ProductService = Depends(get_product_service),
+    admin: Annotated[User, Depends(get_current_admin)],
+    service: Annotated[ProductService, Depends(get_product_service)],
 ):
     try:
         return await service.update(product_id, data)
-    except ProductNotFound:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Товар не найден")
+    except ProductNotFound as err:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Товар не найден") from err
 
 
 @router.delete("/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_product(
     product_id: int,
-    admin: User = Depends(get_current_admin),
-    service: ProductService = Depends(get_product_service),
+    admin: Annotated[User, Depends(get_current_admin)],
+    service: Annotated[ProductService, Depends(get_product_service)],
 ):
     try:
         await service.delete(product_id)
-    except ProductNotFound:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Товар не найден")
+    except ProductNotFound as err:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Товар не найден") from err

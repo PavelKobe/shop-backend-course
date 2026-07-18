@@ -2,18 +2,16 @@ import asyncio
 from logging.config import fileConfig
 
 from sqlalchemy import pool
-from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
-
 from app.core.config import get_settings
 from app.models.base import Base
-# ВАЖНО: импортируем все модели, чтобы autogenerate их «увидел»
-from app.models.product import Product
 from app.models.category import Category  # noqa: F401
+from app.models.order import Cart, CartItem, Order, OrderItem, OrderStatus  # noqa: F401
+
+# ВАЖНО: импортируем все модели, чтобы autogenerate их «увидел»
 from app.models.user import User  # noqa: F401
-from app.models.order import Order, OrderItem, Cart, CartItem, OrderStatus  # noqa: F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

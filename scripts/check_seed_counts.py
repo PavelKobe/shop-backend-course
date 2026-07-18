@@ -10,17 +10,19 @@ from app.models.product import Product
 async def main() -> None:
     async with SessionLocal() as session:
         category_count = await session.scalar(
-            select(func.count()).select_from(Category).where(
-                Category.slug.like("lesson-category-%")
-            )
+            select(func.count())
+            .select_from(Category)
+            .where(Category.slug.like("lesson-category-%"))
         )
         product_count = await session.scalar(
-            select(func.count()).select_from(Product).where(
-                Product.slug.like("lesson-product-%")
-            )
+            select(func.count())
+            .select_from(Product)
+            .where(Product.slug.like("lesson-product-%"))
         )
         linked_product_count = await session.scalar(
-            select(func.count()).select_from(Product).where(
+            select(func.count())
+            .select_from(Product)
+            .where(
                 Product.slug.like("lesson-product-%"),
                 Product.category_id.is_not(None),
             )

@@ -41,8 +41,8 @@ async def main() -> None:
                     description="Temporary product for Redis cache test.",
                 )
             )
-        except SlugAlreadyExists:
-            raise RuntimeError("Temporary product slug already exists")
+        except SlugAlreadyExists as err:
+            raise RuntimeError("Temporary product slug already exists") from err
 
         print(f"after_create_cache_exists={await cache_exists()}")
 

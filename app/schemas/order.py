@@ -1,6 +1,8 @@
 from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict, Field
+
+
 class AddToCart(BaseModel):
     product_id: int
     quantity: int = Field(default=1, gt=0)

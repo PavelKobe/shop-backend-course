@@ -95,10 +95,14 @@ class CartService:
                 if product is None or product.stock < item.quantity:
                     raise ValueError(f"Недостаточно товара: {item.product_id}")
                 product.stock -= item.quantity
-                self.session.add(OrderItem(
-                    order_id=order.id, product_id=product.id,
-                    quantity=item.quantity, price=product.price,
-                ))
+                self.session.add(
+                    OrderItem(
+                        order_id=order.id,
+                        product_id=product.id,
+                        quantity=item.quantity,
+                        price=product.price,
+                    )
+                )
                 total += product.price * item.quantity
 
             order.total = total

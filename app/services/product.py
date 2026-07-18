@@ -82,8 +82,10 @@ class ProductService:
         if await self.repo.get_by_slug(slug):
             raise SlugAlreadyExists
         product = Product(
-            name=data.name, slug=slug,
-            price=data.price, description=data.description,
+            name=data.name,
+            slug=slug,
+            price=data.price,
+            description=data.description,
         )
         product = await self.repo.add(product)
         await invalidate(PRODUCT_CACHE_PATTERN)
